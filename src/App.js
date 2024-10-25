@@ -9,7 +9,6 @@ import Footer from './components/Footer';
 import LoginPage from './components/LoginPage'; // Import your LoginPage component
 import SignupPage from './components/SignupPage'; // Import your SignupPage component
 import DashboardPage from './components/DashboardPage'; // Import the DashboardPage
-import ConfirmationPage from './components/ConfirmationPage';
 import './App.css';
 
 function App() {
@@ -38,7 +37,7 @@ function App() {
           {/* Add the Dashboard route */}
           <Route path="/dashboard" component={DashboardPage} />
           {/* Add the Confirmation route */}
-          <Route path="/confirm/:token" element={<ConfirmationPage />} />
+          <Route path="/confirm/:token" element={<LoginPage />} />
 
         </Routes>
       </div>

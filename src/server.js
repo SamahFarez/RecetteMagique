@@ -18,7 +18,6 @@ app.use(cors({
 
 app.use(express.json());
 
-
 // Configure express-session middleware
 app.use(session({
     secret: '123', // Change this to a secure secret key
@@ -47,8 +46,6 @@ db.connect((err) => {
     console.log('Connected to MySQL');
 });
 
-
-
 // Setup Nodemailer transport
 const transporter = nodemailer.createTransport({
     service: 'gmail', // You can use other services too
@@ -57,6 +54,11 @@ const transporter = nodemailer.createTransport({
         pass: 'foqf vrer mjed uirp' // Your email password or an app password
     }
 });
+
+// Function to generate a random verification code
+const generateVerificationCode = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // Generates a 6-digit code
+};
 
 // Signup function
 const handleSignup = (req, res) => {
@@ -98,7 +100,7 @@ const handleSignup = (req, res) => {
                 // Send confirmation email
                 const confirmationLink = `http://localhost:3000/confirm/${token}`;
                 const mailOptions = {
-                    from: 'your-email@gmail.com',
+                    from: 'samah.ikramfarez@gmail.com', // Your email
                     to: email,
                     subject: 'Email Confirmation',
                     html: `<h1>Welcome ${fullName}!</h1>
@@ -119,7 +121,6 @@ const handleSignup = (req, res) => {
     });
 };
 
-
 // Login function
 const handleLogin = (req, res) => {
     const { email, password } = req.body;
@@ -135,6 +136,11 @@ const handleLogin = (req, res) => {
         }
 
         const user = result[0];
+
+        // Check if user is verified
+        if (!user.isVerified) {
+            return res.status(403).json({ error: 'Email not confirmed. Please check your inbox.' });
+        }
 
         // Compare passwords using bcrypt
         bcrypt.compare(password, user.password, (err, isMatch) => {
@@ -169,10 +175,11 @@ app.get('/dashboard', (req, res) => {
     }
 });
 
+// Email confirmation endpoint
 app.get('/confirm/:token', (req, res) => {
     const token = req.params.token;
 
-    const verifyTokenQuery = 'UPDATE Users SET isVerified = 1 WHERE token = ?';
+    const verifyTokenQuery = 'UPDATE Users SET isVerified = 1, token = NULL WHERE token = ?';
     db.query(verifyTokenQuery, [token], (err, result) => {
         if (err) {
             console.error('Error confirming token:', err);
@@ -183,10 +190,13 @@ app.get('/confirm/:token', (req, res) => {
             return res.status(400).json({ message: 'Invalid token or user already verified' });
         }
 
-        res.status(200).json({ message: 'Email confirmed successfully!' });
+        // Redirect to login page
+        res.status(200).json({ 
+            message: 'Email confirmed successfully!', 
+            redirectUrl: 'http://localhost:3000/login' // Adjust the URL if needed
+        });
     });
 });
-
 
 // Signup route
 app.post('/signup', handleSignup);

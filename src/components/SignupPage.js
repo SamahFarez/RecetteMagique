@@ -46,7 +46,7 @@ const SignupPage = () => {
 
       if (response.ok) {
         // Successful signup
-        navigate('/dashboard'); // Redirect to the dashboard after successful signup
+        navigate('/login'); // Redirect to the login page after successful signup
       } else {
         // Handle backend errors (e.g., user already exists, validation errors)
         setErrorMessage(data.message || 'Signup failed. Please try again.');
@@ -135,6 +135,17 @@ const SignupPage = () => {
           {isLoading ? 'Signing up...' : 'Sign Up'}
         </button>
       </form>
+      {/* Login Redirect Link */}
+      <p className="login-redirect text-normal">
+        You already have an account?{' '}
+        <span 
+          className="login-link" 
+          onClick={() => navigate('/login')} // Redirect to login page
+          style={{ color: '#A98467', cursor: 'pointer' }} // Optional styling
+        >
+          Login
+        </span>
+      </p>
     </div>
   );
 };

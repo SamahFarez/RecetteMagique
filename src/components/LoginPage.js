@@ -81,6 +81,17 @@ const LoginPage = () => {
         </div>
         <button type="submit" className="login-button title-medium">Login</button>
       </form>
+      {/* Signup Redirect Link */}
+      <p className="signup-redirect text-normal">
+        You don't have an account?{' '}
+        <span 
+          className="signup-link" 
+          onClick={() => navigate('/signup')} // Redirect to signup page
+          style={{ color: '#A98467', cursor: 'pointer' }} // Optional styling
+        >
+          Sign up
+        </span>
+      </p>
     </div>
   );
 };
