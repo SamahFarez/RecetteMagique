@@ -1,16 +1,42 @@
 import React, { useState } from 'react';
-import '../App.css'; // Ensure you import the App.css file
-import inputIcon from '../assets/input_icon.png'; // Adjust the path as needed
+import { useNavigate } from 'react-router-dom'; 
+import '../App.css';
+import inputIcon from '../assets/input_icon.png';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Email:', email, 'Password:', password);
+
+    const userData = { email, password };
+
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include credentials for cookies and sessions
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Redirect to Dashboard on successful login
+        navigate('/dashboard');
+      } else {
+        alert(data.error); // Show error message
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('There was an error with your login.');
+    }
   };
+
   // Prevent drag and drop
   const preventDragOver = (e) => {
     e.preventDefault();
@@ -19,7 +45,7 @@ const LoginPage = () => {
   const preventDrop = (e) => {
     e.preventDefault();
   };
-  
+
   return (
     <div className="login-hero">
       <h1 className="title-big">Welcome Back!</h1>
@@ -28,29 +54,29 @@ const LoginPage = () => {
       </p>
       <form onSubmit={handleLogin} className="login-form">
         <div className="input-group">
-          <img src={inputIcon} alt="Email Icon" className="input-icon" /> {/* Email Icon */}
-          <input 
-            type="email" 
-            placeholder="Email" 
+          <img src={inputIcon} alt="Email Icon" className="input-icon" />
+          <input
+            type="email"
+            placeholder="Email"
             value={email}
-            onDragOver={preventDragOver} // Prevent drag over       
-            onDrop={preventDrop} // Prevent drop
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-            className="login-input text-normal-volkorn" 
+            onDragOver={preventDragOver}
+            onDrop={preventDrop}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="login-input text-normal-volkorn"
           />
         </div>
         <div className="input-group">
-          <img src={inputIcon} alt="Password Icon" className="input-icon" /> {/* Password Icon */}
-          <input 
-            type="password" 
+          <img src={inputIcon} alt="Password Icon" className="input-icon" />
+          <input
+            type="password"
             placeholder="Password"
-            onDragOver={preventDragOver} // Prevent drag over       
-            onDrop={preventDrop} // Prevent drop
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
-            className="login-input text-normal-volkorn" 
+            onDragOver={preventDragOver}
+            onDrop={preventDrop}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="login-input text-normal-volkorn"
           />
         </div>
         <button type="submit" className="login-button title-medium">Login</button>
