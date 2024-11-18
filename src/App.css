@@ -1,29 +1,29 @@
-:root{
+:root {
   --white: #ffffff;
-  --dark-brown : #6C584C;
-  --light-brown: #A98467;
-  --beige : #F0EAD2;
-  --light-green : #717744;
-  --dark-green: #373D20;
+  --dark-brown: #6c584c;
+  --light-brown: #a98467;
+  --beige: #f0ead2;
+  --light-green: #717744;
+  --dark-green: #373d20;
   --black: #333;
 }
 
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
-
 .App {
-  background-image: url('./assets/background.png'); /* Absolute path from the public folder */
+  background-image: url("./assets/background.png"); /* Absolute path from the public folder */
   background-size: cover; /* Ensure the background covers the entire container */
   background-position: center; /* Center the background image */
   background-repeat: no-repeat; /* Avoid repeating the background image */
 }
 
 .title-big {
-  font-family: 'Vollkorn SC', serif; /* Use Vollkorn SC for big titles */
+  font-family: "Vollkorn SC", serif; /* Use Vollkorn SC for big titles */
   font-size: 38px;
   font-weight: 600; /* Bold */
   color: #333; /* You can adjust this color */
@@ -31,7 +31,7 @@ body, html {
 
 /* Medium Title (24px) */
 .title-medium {
-  font-family: 'Vollkorn SC', sans-serif; /* Use Tsukimi Rounded for medium titles */
+  font-family: "Vollkorn SC", sans-serif; /* Use Tsukimi Rounded for medium titles */
   font-size: 24px;
   font-weight: 500; /* Semi-bold */
   color: #333; /* You can adjust this color */
@@ -39,7 +39,7 @@ body, html {
 
 /* Normal Text Title (16px) */
 .text-normal {
-  font-family: 'Tsukimi Rounded', sans-serif; /* Use Tsukimi Rounded for normal text titles */
+  font-family: "Tsukimi Rounded", sans-serif; /* Use Tsukimi Rounded for normal text titles */
   font-size: 16px;
   font-weight: 400; /* Regular */
   color: #333; /* You can adjust this color */
@@ -47,7 +47,7 @@ body, html {
 
 /* Normal Text Title (16px) */
 .text-normal-volkorn {
-  font-family: 'Vollkorn SC', sans-serif; /* Use Tsukimi Rounded for normal text titles */
+  font-family: "Vollkorn SC", sans-serif; /* Use Tsukimi Rounded for normal text titles */
   font-size: 20px;
   font-weight: 400; /* Regular */
   color: #333; /* You can adjust this color */
@@ -55,9 +55,8 @@ body, html {
 
 /* Additional styles can go here */
 
-
 .hero {
-  background-image: url('./assets/deco.png');
+  background-image: url("./assets/deco.png");
   background-repeat: none;
   background-size: cover;
   text-align: center;
@@ -68,15 +67,15 @@ body, html {
   margin-top: 200px;
 }
 
-.start{
+.start {
   background-color: var(--dark-brown);
-  color : var(--white);
+  color: var(--white);
   border: none;
   padding: 10px 20px;
   margin-top: 50px;
 }
 
-.start:hover{
+.start:hover {
   cursor: pointer;
 }
 
@@ -97,9 +96,9 @@ body, html {
   padding: 10px 40px;
 }
 
-.navbar ul{
+.navbar ul {
   display: flex;
-  flex-direction:  row;
+  flex-direction: row;
   text-decoration: none;
   list-style: none;
 }
@@ -118,7 +117,7 @@ body, html {
 
 .why-choose-us h2 {
   font-size: 36px; /* Large title size */
-  font-family: 'Volkorn', serif; /* Assuming you use Volkorn RC */
+  font-family: "Volkorn", serif; /* Assuming you use Volkorn RC */
   color: var(--white); /* Defined in :root */
   text-decoration: underline 1px;
   text-underline-offset: 10px;
@@ -138,36 +137,33 @@ body, html {
   padding: 10px 20px; /* Add extra horizontal space to push content inward */
 }
 
-
 .grid-item h3 {
   font-size: 24px; /* Medium title size */
-  font-family: 'Volkorn', serif; /* Font for the title */
+  font-family: "Volkorn", serif; /* Font for the title */
   color: var(--text-color);
   margin-bottom: 10px;
 }
 
 .grid-item p {
   font-size: 16px; /* Normal text size */
-  font-family: 'Tsukimi Rounded', sans-serif; /* Assuming Tsukimi is used for body text */
+  font-family: "Tsukimi Rounded", sans-serif; /* Assuming Tsukimi is used for body text */
   color: var(--text-light-color);
   line-height: 1.5;
 }
 
-
-
-
 /*Login Form*/
-.login-hero, .signup-hero{
-    background-image: url('./assets/deco.png');
-    background-repeat: none;
-    background-size: cover;
-    text-align: center;
-    padding: 100px 20px;
-    height: 70vh;
-  }
+.login-hero,
+.signup-hero {
+  background-image: url("./assets/deco.png");
+  background-repeat: none;
+  background-size: cover;
+  text-align: center;
+  padding: 100px 20px;
+  height: 70vh;
+}
 
-.login-form, .signup-form{
-
+.login-form,
+.signup-form {
   display: flex;
   flex-direction: column;
   height: 40%;
@@ -175,12 +171,11 @@ body, html {
   margin: auto;
 }
 
-.signup-form{
+.signup-form {
   height: 70%;
-
 }
 
-.input-group{
+.input-group {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -193,20 +188,22 @@ body, html {
   margin: auto;
 }
 
-.login-input, .signup-input{
+.login-input,
+.signup-input {
   min-height: 100%;
   width: 100%;
   padding: 10px;
   border: none;
 }
 
-.login-input:focus, .signup-input:focus {
+.login-input:focus,
+.signup-input:focus {
   border: none; /* Remove border on focus */
   outline: none; /* Remove outline on focus for a cleaner look */
 }
 
-
-.login-button, .signup-button{
+.login-button,
+.signup-button {
   width: 20%;
   margin: auto;
   background-color: var(--dark-brown);
@@ -215,14 +212,10 @@ body, html {
   border: none;
 }
 
-.login-button:hover, .signup-button:hover{
-
+.login-button:hover,
+.signup-button:hover {
   cursor: pointer;
 }
-
-
-
-
 
 /* CookieConsent.css */
 .cookie-consent-modal {
@@ -253,7 +246,8 @@ body, html {
   justify-content: space-around;
 }
 
-.accept-button, .reject-button {
+.accept-button,
+.reject-button {
   margin: 5px; /* Add some space around buttons */
   padding: 10px 15px;
   border: none;
@@ -280,4 +274,186 @@ body, html {
 
 .reject-button:hover {
   background-color: var(--dark-brown);
+}
+
+/* Main section styling */
+.popular-recipes {
+  background-color: #5c4633; /* Soft brown background */
+  text-align: center;
+  padding: 40px 20%;
+}
+
+.section-title {
+  color: #f0e6d2;
+  letter-spacing: 2px;
+}
+
+/* Recipe categories button styling */
+.recipe-categories {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.category-button {
+  color: var(--beige);
+  background-color: transparent;
+  border: 2px solid var(--beige);
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  max-width: 25%;
+  min-width: 20%;
+}
+
+.category-button.active,
+.category-button:hover {
+  background-color: #f0e6d2;
+  color: #5c4633;
+}
+
+/* Recipe grid layout */
+.recipe-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.recipe-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.recipe-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensure the image covers the container */
+}
+
+.recipe-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: var(--black);
+  letter-spacing: 1px;
+  background-color: var(--beige);
+  height: 40px;
+  width: 90%;
+  margin: auto;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the text horizontally */
+  text-align: center; /* Ensure the text is centered */
+  border: dashed 2px var(--black); /* Dashed border on top */
+}
+
+/* Hover effect to darken the image */
+.recipe-item:hover .recipe-image {
+  filter: brightness(80%); /* Darken the image on hover */
+}
+
+.how-it-works {
+  position: relative;
+  background: url('./assets/paperplane.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  padding: 50px 0;
+  margin: 50px auto;
+  background-position: center; /* Adjust position as needed */
+  background-size: contain; /* Make sure it fits well without repeating */
+  text-align: center;
+}
+
+.steps {
+  display: flex;
+  justify-content: space-between;
+  width: 62%;
+  margin: auto;
+  gap: 20px;
+  align-items: stretch; /* Ensures all steps are of equal height */
+}
+
+.step {
+  flex: 1; /* Ensures each step takes up equal space */
+  display: flex;
+  flex-direction: column; /* Stacks content vertically */
+  align-items: center;
+  max-width: 300px; /* Limits the max width for each step */
+  height: 100%; /* Adjusts height so that all elements match */
+  border: 2px dashed var(--black);
+  background-color: var(--white);
+  justify-content: flex-start;
+  text-align: center;
+  transition: transform 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.step:hover {
+  transform: scale(1.05); /* Slight zoom on hover */
+}
+
+.step-image {
+  width: 100%;
+  height: auto; /* Keeps the image proportional */
+  object-fit: cover; /* Ensures the image fills the container while maintaining aspect ratio */
+  max-height: 250px; /* Restricts image height to prevent overflow */
+}
+
+.step-title {
+  margin: auto;
+  padding: 15px 0;
+  background-color: #f6f1ed; /* Beige background for the text area */
+  text-transform: uppercase;
+  color: #000;
+  letter-spacing: 1px;
+  width: 100%; /* Ensures the title takes up full width */
+  border-top: 2px dashed #000; /* Dashed border above the title */
+  font-size: 18px;
+}
+
+
+
+footer {
+  padding: 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  margin: auto;
+  color: var(--black);
+}
+
+.footer-logo {
+  font-size: 24px;
+  font-weight: bold;
+  max-width: 15%;
+}
+
+.footer-links ul {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  justify-content: space-around;
+  list-style-type: none;
+  padding: 0;
+}
+
+.footer-links ul li {
+  display: inline;
+  margin-right: 20px;
+}
+
+.footer-links ul li a {
+  text-decoration: none;
+}
+
+.dashed-line {
+  border-top: 2px dashed var(--black); /* Dashed line style */
+  margin-top: 20px; /* Adjust spacing as needed */
+}
+.text-normal {
+  font-weight: normal; /* Example font styling */
 }
