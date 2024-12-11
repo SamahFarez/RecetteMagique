@@ -1,3 +1,7 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+
+# Allow crawling everything else
+Allow: /
+
+# Sitemap location (important for SEO)
+Sitemap: https://recette-magique.vercel.app/sitemap.xml

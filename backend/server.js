@@ -1,10 +1,10 @@
 const express = require('express');
 const axios = require('axios');
-const cors = require('cors');  // Import the CORS package
+const cors = require('cors'); // Import the CORS package
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-const SPOONACULAR_API_KEY = 'e1b5c0675f514fcb86cbecbeb5fbee3f'; // Your API key
+const SPOONACULAR_API_KEY = '23a7bcbc7632490a9d0cbdd754f79fcc'; // Your API key
 
 // Use CORS middleware to allow requests from your frontend (localhost:3000)
 app.use(cors());
@@ -22,10 +22,11 @@ const cleanRecipeName = (title) => {
     return title.replace(/^How to Make\s+/i, ''); // Remove 'How to' at the beginning of the title
 };
 
-// Endpoint to fetch recipes based on ingredients and dietary restrictions
-app.get('/fetch-recipes/:ingredients/:diet?', async (req, res) => {
+// Endpoint to fetch recipes based on ingredients, dietary restrictions, and cuisine types
+app.get('/fetch-recipes/:ingredients/:diet?/:cuisine?', async (req, res) => {
     const ingredientsParam = req.params.ingredients; // Get ingredients from URL
     const dietParam = req.params.diet ? req.params.diet.toLowerCase() : undefined; // Get diet if provided
+    const cuisineParam = req.params.cuisine ? req.params.cuisine.toLowerCase() : undefined; // Get cuisine if provided
     let ingredients = ingredientsParam.split(','); // Split into an array
 
     if (!ingredients || ingredients.length === 0) {
@@ -44,9 +45,11 @@ app.get('/fetch-recipes/:ingredients/:diet?', async (req, res) => {
     const ingredientsString = ingredients.join(',');
 
     try {
-        // Fetch recipes based on ingredients and dietary restrictions
+        // Fetch recipes based on ingredients, dietary restrictions, and cuisine types
         const response = await axios.get(
-            `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredientsString}&apiKey=${SPOONACULAR_API_KEY}${dietParam ? `&diet=${dietParam}` : ''}`
+            `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredientsString}&apiKey=${SPOONACULAR_API_KEY}` +
+            `${dietParam ? `&diet=${dietParam}` : ''}` +
+            `${cuisineParam ? `&cuisine=${cuisineParam}` : ''}`
         );
 
         if (response.data.length === 0) {

@@ -510,6 +510,7 @@ footer {
   border: 2px dashed var(--black);
   padding: 0.5rem 1rem;
   cursor: pointer;
+  margin: 1rem 1rem;
   transition: all 0.3s ease;
 }
 

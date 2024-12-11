@@ -11,7 +11,6 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        // Removed recaptcha check as it is no longer needed
         const userData = { email, password };
 
         try {
@@ -22,6 +21,7 @@ const LoginPage = () => {
                 },
                 credentials: 'include',
                 body: JSON.stringify(userData),
+
             });
 
             const data = await response.json();

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Home Page -->
+  <url>
+    <loc>https://recette-magique.vercel.app/</loc>
+    <lastmod>2024-11-29</lastmod>
+    <priority>1.00</priority>
+  </url>
+
+  <!-- Login Page -->
+  <url>
+    <loc>https://recette-magique.vercel.app/login</loc>
+    <lastmod>2024-11-29</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Signup Page -->
+  <url>
+    <loc>https://recette-magique.vercel.app/signup</loc>
+    <lastmod>2024-11-29</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Dashboard Page -->
+  <url>
+    <loc>https://recette-magique.vercel.app/dashboard</loc>
+    <lastmod>2024-11-29</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Preferences Page -->
+  <url>
+    <loc>https://recette-magique.vercel.app/preferences</loc>
+    <lastmod>2024-11-29</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- API Routes (if relevant, depending on which you want crawled) -->
+  <url>
+    <loc>https://your-api.vercel.app/fetch-recipes/tomato/vegetarian</loc>
+    <lastmod>2024-11-29</lastmod>
+    <priority>0.60</priority>
+  </url>
+
+  <!-- User Backend Routes (if relevant) -->
+  <url>
+    <loc>https://your-user-backend.vercel.app/login</loc>
+    <lastmod>2024-11-29</lastmod>
+    <priority>0.60</priority>
+  </url>
+
+</urlset>

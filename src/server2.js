@@ -1,172 +1,255 @@
-// server.js
 const express = require('express');
-const mysql = require('mysql');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const session = require('express-session'); // Import express-session
+const session = require('express-session');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const axios = require('axios');
+
+require('dotenv').config(); // Load environment variables
+
+const User = require('./models/User'); // Import User schema
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 5000;
+
+// Constants
+const SPOONACULAR_API_KEY = 'e1b5c0675f514fcb86cbecbeb5fbee3f'; // Replace with your Spoonacular API key
+const MEAT_KEYWORDS = ['chicken', 'beef', 'pork', 'lamb', 'turkey', 'duck', 'fish', 'seafood'];
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:3000', // Change to your frontend URL
-    credentials: true // Allow cookies to be sent
+    origin: 'https://recette-magique.vercel.app', // Frontend URL
+    credentials: true, // Enable sending cookies with requests
 }));
+
+// MongoDB Connection
+const mongoURI = 'mongodb+srv://hh:hhhhhhhh@cluster0.5eb3y.mongodb.net/recette?retryWrites=true&w=majority';
 
 app.use(express.json());
 
-// Configure express-session middleware
 app.use(session({
-    secret: '123', // Change this to a secure secret key
-    resave: false,
-    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET || '1234', // Use an env variable for production
+    resave: true,
+    saveUninitialized: false,
     cookie: {
-        secure: false, // Set to true if using HTTPS
+        secure: true, // Set this to true if your site uses HTTPS
         httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 // 1 day
-    }
+        sameSite: 'none', // Allows cookies to be sent in cross-site requests
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
 }));
 
-// MySQL Connection
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'ikram',
-    password: 'hhhhhhhh',
-    database: 'recettemagique'
-});
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('Connected to MongoDB Atlas'))
+    .catch((err) => console.error('Error connecting to MongoDB Atlas: ', err));
 
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to MySQL: ', err);
-        return;
-    }
-    console.log('Connected to MySQL');
-});
-
-// Setup Nodemailer transport
-const transporter = nodemailer.createTransport({
-    service: 'gmail', // You can use other services too
-    auth: {
-        user: 'samah.ikramfarez@gmail.com', // Your email
-        pass: 'foqf vrer mjed uirp' // Your email password or an app password
-    }
-});
-
-// Function to generate a random verification code
-const generateVerificationCode = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString(); // Generates a 6-digit code
+// Helper functions
+const filterNonVegetarianIngredients = (ingredients) => {
+    return ingredients.filter(ingredient => !MEAT_KEYWORDS.includes(ingredient.toLowerCase()));
 };
 
-// Signup function
-const handleSignup = (req, res) => {
-    console.log('Starting signup process...'); // Log the start
-    const { fullName, email, password } = req.body;
+const cleanRecipeName = (title) => {
+    return title.replace(/^How to Make\s+/i, ''); // Remove 'How to' at the beginning of the title
+};
 
-    // Check if user already exists
-    console.log('Checking if user exists...');
-    const checkUserQuery = 'SELECT * FROM Users WHERE email = ?';
-    db.query(checkUserQuery, [email], (err, result) => {
-        if (err) {
-            console.error('Error checking for existing user:', err);
-            return res.status(500).json({ message: 'Server error' });
+// Routes
+
+// Save preferences route
+app.post('/api/save-preferences', async (req, res) => {
+    console.log('Session data:', req.session);
+    try {
+        const { preferences } = req.body;
+
+        if (!req.session.user) {
+            return res.status(401).json({ error: 'Unauthorized. Please log in first.' });
         }
 
-        if (result.length > 0) {
-            console.log('User already exists');
+        const user = await User.findOne({ email: req.session.user.email });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        user.foodPreferences = preferences;
+        await user.save();
+
+        res.status(200).json({ message: 'Preferences saved successfully!' });
+    } catch (error) {
+        console.error('Error saving preferences:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Fetch recipes route
+app.get('/fetch-recipes/:ingredients/:diet?', async (req, res) => {
+    const ingredientsParam = req.params.ingredients;
+    const dietParam = req.params.diet ? req.params.diet.toLowerCase() : undefined;
+    let ingredients = ingredientsParam.split(',');
+
+    if (!ingredients || ingredients.length === 0) {
+        return res.status(400).json({ error: 'Please provide valid ingredients.' });
+    }
+
+    if (dietParam === 'vegetarian') {
+        ingredients = filterNonVegetarianIngredients(ingredients);
+    }
+
+    if (ingredients.length === 0) {
+        return res.status(400).json({ error: 'No valid vegetarian ingredients were provided.' });
+    }
+
+    const ingredientsString = ingredients.join(',');
+
+    try {
+        const response = await axios.get(
+            `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredientsString}&apiKey=${SPOONACULAR_API_KEY}${dietParam ? `&diet=${dietParam}` : ''}`
+        );
+
+        if (response.data.length === 0) {
+            return res.status(404).send('No recipes found.');
+        }
+
+        const detailedRecipes = await Promise.all(response.data.map(async recipe => {
+            const recipeDetailResponse = await axios.get(`https://api.spoonacular.com/recipes/${recipe.id}/information?apiKey=${SPOONACULAR_API_KEY}`);
+            let { title, readyInMinutes, instructions, extendedIngredients } = recipeDetailResponse.data;
+
+            title = cleanRecipeName(title);
+            const usedIngredients = extendedIngredients.map(ing => ing.name).join(', ');
+
+            return `Recipe Name: ${title}\nCooking Time: ${readyInMinutes} minutes\nIngredients: ${usedIngredients}\nInstructions: ${instructions}\n\n`;
+        }));
+
+        const filteredRecipes = detailedRecipes.filter(recipe => recipe !== null);
+
+        if (filteredRecipes.length === 0) {
+            return res.status(404).send('No suitable recipes found.');
+        }
+
+        res.send(`<pre>${filteredRecipes.join('\n\n')}</pre>`);
+    } catch (error) {
+        console.error('Error fetching recipes:', error.message);
+        res.status(500).json({ error: 'Error fetching recipes from API.' });
+    }
+});
+
+// Authentication and User Management Routes (Signup, Login, Confirm Email)
+
+// Signup
+app.post('/signup', async (req, res) => {
+    try {
+        const { fullName, email, password, foodPreferences } = req.body;
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        console.log('Hashing password...');
-        bcrypt.hash(password, 10, (err, hashedPassword) => {
-            if (err) {
-                console.error('Error hashing password:', err);
-                return res.status(500).json({ message: 'Error hashing password' });
-            }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const token = crypto.randomBytes(32).toString('hex');
 
-            // Create a confirmation token
-            const token = crypto.randomBytes(32).toString('hex');
-
-            // Use the correct column names here
-            const insertUserQuery = 'INSERT INTO Users (full_name, email, password, token, isVerified) VALUES (?, ?, ?, ?, 0)';
-            db.query(insertUserQuery, [fullName, email, hashedPassword, token], (err) => {
-                if (err) {
-                    console.error('Error inserting new user:', err);
-                    return res.status(500).json({ message: 'Error registering user' });
-                }
-
-                // Send confirmation email
-                const confirmationLink = `https://recettemagique.onrender.com/confirm/${token}`;
-                const mailOptions = {
-                    from: 'samah.ikramfarez@gmail.com', // Your email
-                    to: email,
-                    subject: 'Email Confirmation',
-                    html: `<h1>Welcome ${fullName}!</h1>
-                           <p>Please confirm your email by clicking the link: 
-                           <a href="${confirmationLink}">Confirm Email</a></p>`
-                };
-
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        console.error('Error sending email:', error);
-                        return res.status(500).json({ message: 'Error sending confirmation email' });
-                    }
-                    console.log('Confirmation email sent:', info.response);
-                    res.status(200).json({ message: 'User registered successfully, please confirm your email' });
-                });
-            });
+        const newUser = new User({
+            full_name: fullName,
+            email,
+            password: hashedPassword,
+            token,
+            isVerified: false,
+            foodPreferences: foodPreferences || {},
         });
-    });
-};
 
-// Login function
-const handleLogin = (req, res) => {
-    const { email, password } = req.body;
+        await newUser.save();
 
-    const query = 'SELECT * FROM Users WHERE email = ?';
-    db.query(query, [email], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: 'Server error' });
-        }
+        const confirmationLink = `https://recettemagique.onrender.com/confirm/${token}`;
 
-        if (result.length === 0) {
+        const mailOptions = {
+            from: 'recette.magique.cy@gmail.com',
+            to: email,
+            subject: 'Email Confirmation',
+            html: `<h1>Welcome ${fullName}!</h1>
+                   <p>Please confirm your email by clicking the link: 
+                   <a href="${confirmationLink}">Confirm Email</a></p>`,
+        };
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'recette.magique.cy@gmail.com',
+                pass: 'jyoj afjs utcm swwe',
+            },
+        });
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending email:', error);
+                return res.status(500).json({ message: 'Error sending confirmation email' });
+            }
+            console.log('Confirmation email sent:', info.response);
+            res.status(200).json({ message: 'User registered successfully, please confirm your email' });
+        });
+    } catch (error) {
+        console.error('Error during signup:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Login
+app.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
             return res.status(401).json({ error: 'User not found' });
         }
 
-        const user = result[0];
-
-        // Check if user is verified
         if (!user.isVerified) {
             return res.status(403).json({ error: 'Email not confirmed. Please check your inbox.' });
         }
 
-        // Compare passwords using bcrypt
-        bcrypt.compare(password, user.password, (err, isMatch) => {
-            if (err) {
-                return res.status(500).json({ error: 'Error comparing passwords' });
-            }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ error: 'Incorrect password' });
+        }
 
-            if (!isMatch) {
-                return res.status(401).json({ error: 'Incorrect password' });
-            }
+        req.session.user = {
+            email: user.email,
+            fullName: user.full_name,
+        };
 
-            // Create a session for the user
-            req.session.user = {
-                email: user.email,
-                fullName: user.full_name, // Adjust according to your user schema
-            };
+        const redirectUrl = Object.keys(user.foodPreferences).length === 0 ? '/preferences' : '/dashboard';
+        res.status(200).json({ message: 'Login successful', redirectUrl });
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
-            console.log('Session created:', req.session.user); // Log the session for debugging
+// Email confirmation
+app.get('/confirm/:token', async (req, res) => {
+    try {
+        const token = req.params.token;
 
-            // Send a success response
-            res.json({ message: 'Login successful', user });
-        });
-    });
-};
+        const user = await User.findOne({ token });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid token or user already verified' });
+        }
 
-// Dashboard route
+        if (user.isVerified) {
+            return res.redirect('http://recette-magique.vercel.app/login');
+        }
+
+        user.isVerified = true;
+        user.token = null;
+        await user.save();
+
+        res.redirect('http://recette-magique.vercel.app/login');
+    } catch (error) {
+        console.error('Error confirming token:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Dashboard
 app.get('/dashboard', (req, res) => {
     if (req.session.user) {
         res.json({ message: 'Welcome to the dashboard!', user: req.session.user });
@@ -175,36 +258,20 @@ app.get('/dashboard', (req, res) => {
     }
 });
 
-// Email confirmation endpoint
-app.get('/confirm/:token', (req, res) => {
-    const token = req.params.token;
-
-    const verifyTokenQuery = 'UPDATE Users SET isVerified = 1, token = NULL WHERE token = ?';
-    db.query(verifyTokenQuery, [token], (err, result) => {
+// Logout route
+app.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
         if (err) {
-            console.error('Error confirming token:', err);
-            return res.status(500).json({ message: 'Server error' });
+            return res.status(500).json({ error: 'Failed to log out' });
         }
 
-        if (result.affectedRows === 0) {
-            return res.status(400).json({ message: 'Invalid token or user already verified' });
-        }
-
-        // Redirect to login page
-        res.status(200).json({ 
-            message: 'Email confirmed successfully!', 
-            redirectUrl: 'http://localhost:3000/login' // Adjust the URL if needed
-        });
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        res.status(200).json({ message: 'Logged out successfully' });
     });
 });
 
-// Signup route
-app.post('/signup', handleSignup);
-
-// Login route
-app.post('/login', handleLogin);
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
