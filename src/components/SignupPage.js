@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Importer useNavigate
 import '../App.css'; // Assurez-vous que votre CSS est correctement lié
 import inputIcon from '../assets/input_icon.png'; // Ajustez le chemin si nécessaire
@@ -12,28 +12,6 @@ const SignupPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate(); // Initialiser useNavigate
-
-
-  useEffect(() => {
-    // Check if the user is already logged in by making an API call to the backend
-    const checkLoginStatus = async () => {
-        try {
-            const response = await fetch('https://recettemagique.onrender.com/dashboard', {
-                method: 'GET',
-                credentials: 'include', // Send cookies to verify session
-            });
-
-            if (response.ok) {
-                // If the user is logged in, redirect to the dashboard
-                navigate('/dashboard');
-            }
-        } catch (error) {
-            console.log('User is not logged in', error);
-        }
-    };
-
-    checkLoginStatus();
-}, [navigate]); // Runs only once when the component mounts
 
   // Gérer la soumission du formulaire d'inscription
   const handleSignup = async (e) => {
