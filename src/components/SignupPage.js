@@ -1,81 +1,91 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importer useNavigate
-import '../App.css'; // Assurez-vous que votre CSS est correctement lié
-import inputIcon from '../assets/input_icon.png'; // Ajustez le chemin si nécessaire
+import { useNavigate } from 'react-router-dom';
+import '../App.css'; 
+import inputIcon from '../assets/input_icon.png';
 
 const SignupPage = () => {
-  // Hooks d'état pour gérer les données du formulaire et la gestion des erreurs
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmedPassword, setConfirmedPassword] = useState('');
+  const [dietPreference, setDietPreference] = useState('None'); // New state for diet preference
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate(); // Initialiser useNavigate
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const navigate = useNavigate();
 
-  // Gérer la soumission du formulaire d'inscription
+  const checkPasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+    return strength;
+  };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setPasswordStrength(checkPasswordStrength(newPassword));
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
-
-    // Effacer les messages d'erreur précédents
     setErrorMessage('');
 
-    // Vérifier si les mots de passe correspondent
     if (password !== confirmedPassword) {
       setErrorMessage('Les mots de passe ne correspondent pas.');
       return;
     }
 
-    // Rassembler les données de l'utilisateur à envoyer au backend
+    if (passwordStrength < 4) {
+      setErrorMessage('Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.');
+      return;
+    }
+
     const userData = {
       fullName,
       email,
       password,
+      dietPreference, // Include diet preference in signup data
     };
 
-    setIsLoading(true); // Définir l'état de chargement sur true
+    setIsLoading(true);
 
     try {
-      // Envoyer la requête POST au serveur pour créer un nouvel utilisateur
-      const response = await fetch('https://recettemagique.onrender.com/signup', {
+      const response = await fetch('http://localhost:5000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Inclure les cookies/sessions si nécessaire
+        credentials: 'include',
         body: JSON.stringify(userData),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Inscription réussie, rediriger vers la page de connexion
         navigate('/login');
       } else {
-        // Gérer les erreurs comme un utilisateur déjà existant ou d'autres erreurs de validation
         setErrorMessage(data.message || 'L\'inscription a échoué. Veuillez réessayer.');
       }
     } catch (error) {
-      // Gérer les erreurs réseau ou serveur
       console.error('Erreur lors de l\'inscription :', error);
       setErrorMessage('Il y a eu une erreur lors de la connexion au serveur.');
     } finally {
-      setIsLoading(false); // Fin de l'état de chargement
+      setIsLoading(false);
     }
   };
 
-  // Empêcher le comportement de glisser-déposer sur les champs de saisie
   const preventDragOver = (e) => e.preventDefault();
   const preventDrop = (e) => e.preventDefault();
 
   return (
     <div className="signup-hero">
       <h1 className="title-big">Bienvenue chez nous!</h1>
-      <p className="text-normal">
-        Laissez-nous trouver pour vous les meilleures recettes que vous pouvez préparer avec ce que vous avez à la maison.
-      </p>
       <form onSubmit={handleSignup} className="signup-form">
-        {/* Champ de saisie pour le nom complet */}
+        {/* Full Name Input */}
         <div className="input-group">
           <img src={inputIcon} alt="Icône Nom Complet" className="input-icon" />
           <input 
@@ -89,8 +99,8 @@ const SignupPage = () => {
             className="signup-input text-normal-volkorn" 
           />
         </div>
-        
-        {/* Champ de saisie pour l'email */}
+
+        {/* Email Input */}
         <div className="input-group">
           <img src={inputIcon} alt="Icône Email" className="input-icon" />
           <input 
@@ -104,8 +114,8 @@ const SignupPage = () => {
             className="signup-input text-normal-volkorn" 
           />
         </div>
-        
-        {/* Champ de saisie pour le mot de passe */}
+
+        {/* Password Input */}
         <div className="input-group">
           <img src={inputIcon} alt="Icône Mot de passe" className="input-icon" />
           <input 
@@ -114,13 +124,23 @@ const SignupPage = () => {
             value={password}
             onDragOver={preventDragOver}
             onDrop={preventDrop}
-            onChange={(e) => setPassword(e.target.value)} 
+            onChange={handlePasswordChange} 
             required 
             className="signup-input text-normal-volkorn" 
           />
+          <div className="password-strength-meter">
+            <progress value={passwordStrength} max={5}></progress>
+            <span className="password-strength-label">
+              {passwordStrength === 0 ? 'Très faible' : 
+               passwordStrength === 1 ? 'Faible' : 
+               passwordStrength === 2 ? 'Moyenne' : 
+               passwordStrength === 3 ? 'Bonne' : 
+               'Très forte'}
+            </span>
+          </div>
         </div>
-        
-        {/* Champ de saisie pour la confirmation du mot de passe */}
+
+        {/* Confirm Password Input */}
         <div className="input-group">
           <img src={inputIcon} alt="Icône Confirmer le mot de passe" className="input-icon" />
           <input 
@@ -135,26 +155,30 @@ const SignupPage = () => {
           />
         </div>
 
-        {/* Afficher le message d'erreur si nécessaire */}
+        {/* Diet Preference Dropdown */}
+        <div className="input-group">
+          <label htmlFor="diet-preference" className="text-normal-volkorn">Préférence Alimentaire</label>
+          <select
+            id="diet-preference"
+            value={dietPreference}
+            onChange={(e) => setDietPreference(e.target.value)}
+            className="signup-input text-normal-volkorn"
+          >
+            <option value="None">Aucune</option>
+            <option value="Vegetarian">Végétarien</option>
+            <option value="Vegan">Végétalien</option>
+            <option value="Pescatarian">Pescatarien</option>
+            <option value="Halal">Halal</option>
+            <option value="Kosher">Kasher</option>
+          </select>
+        </div>
+
         {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-        {/* Bouton de soumission */}
         <button type="submit" className="signup-button title-medium" disabled={isLoading}>
           {isLoading ? 'Inscription en cours...' : 'S\'inscrire'}
         </button>
       </form>
-
-      {/* Lien pour se rediriger vers la page de connexion si l'utilisateur a déjà un compte */}
-      <p className="login-redirect text-normal">
-        Vous avez déjà un compte ?{' '}
-        <span 
-          className="login-link" 
-          onClick={() => navigate('/login')} 
-          style={{ color: '#A98467', cursor: 'pointer' }}
-        >
-          Se connecter
-        </span>
-      </p>
     </div>
   );
 };
