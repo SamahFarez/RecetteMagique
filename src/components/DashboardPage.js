@@ -7,7 +7,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     // Fetch data directly from your backend API
-    fetch('https://recettemagique.onrender.com/fetch-recipes/tomato/vegetarian')  // Update the URL to match your tested endpoint
+    fetch('https://recettemagique.onrender.com/fetch-recipes/tomato,egg,pork', {
+      credentials: 'include'  // This ensures the session cookie is sent
+    })
       .then(response => {
         if (response.ok) {
           return response.text();  // Convert the response to text (since you're dealing with raw text data)
@@ -34,19 +36,54 @@ const Dashboard = () => {
       });
   }, []);
 
+  // Function to parse the raw text data into an array of recipe objects
+  const parseRecipes = (rawData) => {
+    const recipeRegex = /Recipe Name: (.*?)\nCooking Time: (.*?)\nIngredients: (.*?)\nInstructions: (.*?)(?=Recipe Name:|$)/gs;
+    const recipes = [];
+    let match;
+
+    while ((match = recipeRegex.exec(rawData)) !== null) {
+      recipes.push({
+        name: match[1],
+        cookingTime: match[2],
+        ingredients: match[3].replace(/,\s/g, ', ').split(','),
+        instructions: match[4].replace(/<ol>/g, '').replace(/<\/li>/g, '').replace(/<li>/g, '<p>').replace(/<\/ol>/g, ''),
+      });
+    }
+
+    return recipes;
+  };
+
+  // Parse the recipe data from raw text
+  const recipes = parseRecipes(data);
+
   return (
     <div>
-      <h1>Dashboard</h1>
+<h1 className="centered-title">Dashboard</h1>
 
       {/* Display error message if any */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* Display the raw data received from the API */}
-      <h2>Raw Recipe Data</h2>
-      <pre>{data}</pre>  {/* Output the raw data directly */}
-      
+      {/* Grid Container */}
+      <div className="text-normal-volkorn recipe-grid">
+        {recipes.map((recipe, index) => (
+          <div key={index} className="recipe-card">
+            <h2>{recipe.name}</h2>
+            <p><strong>Cooking Time:</strong> {recipe.cookingTime}</p>
+            <p><strong>Ingredients:</strong></p>
+            <ul>
+              {recipe.ingredients.map((ingredient, i) => (
+                <li key={i}>{ingredient}</li>
+              ))}
+            </ul>
+            <p><strong>Instructions:</strong></p>
+            <div dangerouslySetInnerHTML={{ __html: recipe.instructions }} />
+          </div>
+        ))}
+      </div>
+
       {/* Log out button */}
-      <LogoutButton /> {/* This button triggers the logout */}
+      <LogoutButton class="preference-option" /> {/* This button triggers the logout */}
     </div>
   );
 };
