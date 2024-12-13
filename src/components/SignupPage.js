@@ -8,7 +8,7 @@ const SignupPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmedPassword, setConfirmedPassword] = useState('');
-  const [dietPreference, setDietPreference] = useState('None'); // New state for diet preference
+  const [dietPreference, setDietPreference] = useState('None'); // Default to 'None'
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
@@ -48,7 +48,7 @@ const SignupPage = () => {
       fullName,
       email,
       password,
-      dietPreference, // Include diet preference in signup data
+      foodPreferences: dietPreference, // Send the diet preference to the backend
     };
 
     setIsLoading(true);
