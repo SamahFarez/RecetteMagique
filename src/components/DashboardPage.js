@@ -28,17 +28,16 @@ const Dashboard = () => {
       });
 
     // Fetch recipes data
-    axios
-      .get('https://recettemagique.onrender.com/fetch-recipes/tomato,egg,pork', {
-        withCredentials: true,  // Send cookies along with the request
-      })
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((error) => {
-        setError('Error fetching data');
-        console.error(error);
-      });
+const [ingredients, setIngredients] = useState('');
+
+const handleFetchRecipes = () => {
+  axios.get(`https://recettemagique.onrender.com/fetch-recipes/${ingredients}`, {
+    withCredentials: true,
+  })
+  .then(response => setData(response.data))
+  .catch(error => setError('Error fetching recipes'));
+};
+
   }, []);
 
   // Function to parse the raw text data into an array of recipe objects
