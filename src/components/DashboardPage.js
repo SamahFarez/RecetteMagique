@@ -7,45 +7,35 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Log the cookies to the console
-    console.log('Cookies:', document.cookie);  // This will show the cookies stored in the browser
+  // Log the cookies to the console
+  console.log('Cookies:', document.cookie);  // This will show the cookies stored in the browser
 
-    // Fetch data using Axios
-    axios
-      .get('https://recettemagique.onrender.com/fetch-recipes/tomato,egg,pork', {
-        withCredentials: true, // Ensures cookies are included
-      })
-      .then((response) => {
-        setData(response.data); // Set the data (response.data contains the raw text)
-      })
-      .catch((error) => {
-        // Handle errors more gracefully with Axios
-        if (error.response) {
-          // Server responded with a status code other than 2xx
-          switch (error.response.status) {
-            case 402:
-              setError('Daily API limit exceeded. Please try again later.');
-              break;
-            case 404:
-              setError('Recipes not found. Please check your ingredients or try again later.');
-              break;
-            case 500:
-              setError('Server error. Please try again.');
-              break;
-            default:
-              setError('An unexpected error occurred.');
-          }
-        } else if (error.request) {
-          // No response received from the server
-          setError('No response from the server. Please check your network.');
-        } else {
-          // Something else went wrong
-          setError(`Error: ${error.message}`);
-        }
+  // Fetch session data from the backend
+  axios
+    .get('https://recettemagique.onrender.com/session', {
+      withCredentials: true,  // Ensure cookies are included in the request
+    })
+    .then((response) => {
+      console.log('Session Data:', response.data);  // Log session data
+    })
+    .catch((error) => {
+      console.error('Error fetching session data:', error);
+    });
 
-        console.error(error); // Log for debugging
-      });
-  }, []);
+  // Fetch recipes
+  axios
+    .get('https://recettemagique.onrender.com/fetch-recipes/tomato,egg,pork', {
+      withCredentials: true,
+    })
+    .then((response) => {
+      setData(response.data);
+    })
+    .catch((error) => {
+      setError('Error fetching data');
+      console.error(error);
+    });
+}, []);
+
 
 
   // Function to parse the raw text data into an array of recipe objects
