@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import LogoutButton from './LogoutButton';  // Import the LogoutButton component
+import LogoutButton from './LogoutButton';
 import axios from 'axios';
 
 const Dashboard = () => {
@@ -7,36 +7,39 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-  // Log the cookies to the console
-  console.log('Cookies:', document.cookie);  // This will show the cookies stored in the browser
+    // Log the cookies to the console
+    console.log('Cookies:', document.cookie);  // Show cookies in the browser console
 
-  // Fetch session data from the backend
-  axios
-    .get('https://recettemagique.onrender.com/session', {
-      withCredentials: true,  // Ensure cookies are included in the request
-    })
-    .then((response) => {
-      console.log('Session Data:', response.data);  // Log session data
-    })
-    .catch((error) => {
-      console.error('Error fetching session data:', error);
-    });
+    // Fetch session data from the backend
+    axios
+      .get('https://recettemagique.onrender.com/session', {
+        withCredentials: true,  // Ensure cookies are included in the request
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Credentials': 'true',  // Explicitly allow credentials
+        },
+      })
+      .then((response) => {
+        console.log('Session Data:', response.data);  // Log session data
+      })
+      .catch((error) => {
+        console.error('Error fetching session data:', error);
+        setError('Error fetching session data');
+      });
 
-  // Fetch recipes
-  axios
-    .get('https://recettemagique.onrender.com/fetch-recipes/tomato,egg,pork', {
-      withCredentials: true,
-    })
-    .then((response) => {
-      setData(response.data);
-    })
-    .catch((error) => {
-      setError('Error fetching data');
-      console.error(error);
-    });
-}, []);
-
-
+    // Fetch recipes data
+    axios
+      .get('https://recettemagique.onrender.com/fetch-recipes/tomato,egg,pork', {
+        withCredentials: true,  // Send cookies along with the request
+      })
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((error) => {
+        setError('Error fetching data');
+        console.error(error);
+      });
+  }, []);
 
   // Function to parse the raw text data into an array of recipe objects
   const parseRecipes = (rawData) => {
@@ -56,7 +59,6 @@ const Dashboard = () => {
     return recipes;
   };
 
-  // Parse the recipe data from raw text
   const recipes = parseRecipes(data);
 
   return (
@@ -85,7 +87,7 @@ const Dashboard = () => {
       </div>
 
       {/* Log out button */}
-      <LogoutButton class="preference-option" /> {/* This button triggers the logout */}
+      <LogoutButton class="preference-option" />
     </div>
   );
 };
