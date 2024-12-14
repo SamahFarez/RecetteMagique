@@ -6,44 +6,46 @@ const Dashboard = () => {
   const [data, setData] = useState('');
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    // Log the cookies to the console
+    console.log('Cookies:', document.cookie);  // This will show the cookies stored in the browser
 
-useEffect(() => {
-  // Fetch data using Axios
-  axios
-    .get('https://recettemagique.onrender.com/fetch-recipes/tomato,egg,pork', {
-      withCredentials: true, // Ensures cookies are included
-    })
-    .then((response) => {
-      setData(response.data); // Set the data (response.data contains the raw text)
-    })
-    .catch((error) => {
-      // Handle errors more gracefully with Axios
-      if (error.response) {
-        // Server responded with a status code other than 2xx
-        switch (error.response.status) {
-          case 402:
-            setError('Daily API limit exceeded. Please try again later.');
-            break;
-          case 404:
-            setError('Recipes not found. Please check your ingredients or try again later.');
-            break;
-          case 500:
-            setError('Server error. Please try again.');
-            break;
-          default:
-            setError('An unexpected error occurred.');
+    // Fetch data using Axios
+    axios
+      .get('https://recettemagique.onrender.com/fetch-recipes/tomato,egg,pork', {
+        withCredentials: true, // Ensures cookies are included
+      })
+      .then((response) => {
+        setData(response.data); // Set the data (response.data contains the raw text)
+      })
+      .catch((error) => {
+        // Handle errors more gracefully with Axios
+        if (error.response) {
+          // Server responded with a status code other than 2xx
+          switch (error.response.status) {
+            case 402:
+              setError('Daily API limit exceeded. Please try again later.');
+              break;
+            case 404:
+              setError('Recipes not found. Please check your ingredients or try again later.');
+              break;
+            case 500:
+              setError('Server error. Please try again.');
+              break;
+            default:
+              setError('An unexpected error occurred.');
+          }
+        } else if (error.request) {
+          // No response received from the server
+          setError('No response from the server. Please check your network.');
+        } else {
+          // Something else went wrong
+          setError(`Error: ${error.message}`);
         }
-      } else if (error.request) {
-        // No response received from the server
-        setError('No response from the server. Please check your network.');
-      } else {
-        // Something else went wrong
-        setError(`Error: ${error.message}`);
-      }
 
-      console.error(error); // Log for debugging
-    });
-}, []);
+        console.error(error); // Log for debugging
+      });
+  }, []);
 
 
   // Function to parse the raw text data into an array of recipe objects
@@ -69,7 +71,7 @@ useEffect(() => {
 
   return (
     <div>
-<h1 className="centered-title">Dashboard</h1>
+      <h1 className="centered-title">Dashboard</h1>
 
       {/* Display error message if any */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
