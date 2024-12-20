@@ -1,6 +1,7 @@
 User-agent: *
+
 # Allow crawling everything else
 Allow: /
 
 # Sitemap location (important for SEO)
-Sitemap: https://recette-magique.vercel.app/sitemap.xml
+Sitemap: http://localhost:3000/sitemap.xml

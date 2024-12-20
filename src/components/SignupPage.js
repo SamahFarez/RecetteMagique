@@ -8,7 +8,6 @@ const SignupPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmedPassword, setConfirmedPassword] = useState('');
-  const [dietPreference, setDietPreference] = useState('None'); // Default to 'None'
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
@@ -48,13 +47,12 @@ const SignupPage = () => {
       fullName,
       email,
       password,
-      foodPreferences: dietPreference, // Send the diet preference to the backend
     };
 
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://recettemagique.onrender.com/signup', {
+      const response = await fetch('http://localhost:5000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,30 +153,23 @@ const SignupPage = () => {
           />
         </div>
 
-        {/* Diet Preference Dropdown */}
-        <div className="input-group">
-          <label htmlFor="diet-preference" className="text-normal-volkorn">Préférence Alimentaire</label>
-          <select
-            id="diet-preference"
-            value={dietPreference}
-            onChange={(e) => setDietPreference(e.target.value)}
-            className="signup-input text-normal-volkorn"
-          >
-            <option value="None">Aucune</option>
-            <option value="Vegetarian">Végétarien</option>
-            <option value="Vegan">Végétalien</option>
-            <option value="Pescatarian">Pescatarien</option>
-            <option value="Halal">Halal</option>
-            <option value="Kosher">Kasher</option>
-          </select>
-        </div>
-
         {errorMessage && <p className="error-message">{errorMessage}</p>}
 
         <button type="submit" className="signup-button title-medium" disabled={isLoading}>
           {isLoading ? 'Inscription en cours...' : 'S\'inscrire'}
         </button>
       </form>
+         {/* Lien pour se rediriger vers la page de connexion si l'utilisateur a déjà un compte */}
+         <p className="login-redirect text-normal">
+        Vous avez déjà un compte ?{' '}
+        <span 
+          className="login-link" 
+          onClick={() => navigate('/login')} 
+          style={{ color: '#A98467', cursor: 'pointer' }}
+        >
+          Se connecter
+        </span>
+      </p>
     </div>
   );
 };

@@ -20,6 +20,9 @@ const Navbar = () => {
         <li className="text-normal-volkorn"><a href="#menu">Menu</a></li>
         <li className="text-normal-volkorn"><a href="#about">À propos</a></li>
         <li className="text-normal-volkorn"><a href="#contact">Contact</a></li>
+        <li>
+                        <div class="text-light" id="google_translate_element"></div>
+                    </li>
       </ul>
     </nav>
   );

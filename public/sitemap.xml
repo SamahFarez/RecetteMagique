@@ -3,38 +3,51 @@
 
   <!-- Home Page -->
   <url>
-    <loc>https://recette-magique.vercel.app/</loc>
+    <loc>http://localhost:3000/</loc>
     <lastmod>2024-11-29</lastmod>
     <priority>1.00</priority>
   </url>
 
   <!-- Login Page -->
   <url>
-    <loc>https://recette-magique.vercel.app/login</loc>
+    <loc>http://localhost:3000/login</loc>
     <lastmod>2024-11-29</lastmod>
     <priority>0.80</priority>
   </url>
 
   <!-- Signup Page -->
   <url>
-    <loc>https://recette-magique.vercel.app/signup</loc>
+    <loc>http://localhost:3000/signup</loc>
     <lastmod>2024-11-29</lastmod>
     <priority>0.80</priority>
   </url>
 
   <!-- Dashboard Page -->
   <url>
-    <loc>https://recette-magique.vercel.app/dashboard</loc>
+    <loc>http://localhost:3000/dashboard</loc>
     <lastmod>2024-11-29</lastmod>
     <priority>0.80</priority>
   </url>
 
   <!-- Preferences Page -->
   <url>
-    <loc>https://recette-magique.vercel.app/preferences</loc>
+    <loc>http://localhost:3000/preferences</loc>
     <lastmod>2024-11-29</lastmod>
     <priority>0.80</priority>
   </url>
 
+  <!-- API Routes (if relevant, depending on which you want crawled) -->
+  <url>
+    <loc>https://your-api.vercel.app/fetch-recipes/tomato/vegetarian</loc>
+    <lastmod>2024-11-29</lastmod>
+    <priority>0.60</priority>
+  </url>
+
+  <!-- User Backend Routes (if relevant) -->
+  <url>
+    <loc>https://your-user-backend.vercel.app/login</loc>
+    <lastmod>2024-11-29</lastmod>
+    <priority>0.60</priority>
+  </url>
 
 </urlset>

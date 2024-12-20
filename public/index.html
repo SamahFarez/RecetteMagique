@@ -14,6 +14,47 @@
     <link href="https://fonts.googleapis.com/css2?family=Tsukimi+Rounded:wght@400;700&family=Vollkorn+SC:wght@400;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>React App</title>
+
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+          new google.translate.TranslateElement({
+              pageLanguage: 'en',
+              includedLanguages: 'en,fr' // Add more languages if needed
+          }, 'google_translate_element');
+      }
+  </script>
+  <script type="text/javascript"
+  src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <script type="text/javascript">
+      document.addEventListener('DOMContentLoaded', function() {
+          const selectElement = document.getElementById('languageSelect');
+
+          selectElement.addEventListener('change', function() {
+              const targetLanguage = selectElement.value;
+
+              // Wait for Google Translate to fully load
+              setTimeout(function() {
+                  const iframe = document.querySelector('.goog-te-menu-frame');
+                  if (iframe) {
+                      const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                      const languageSelect = iframeDocument.querySelector('select.goog-te-menu2');
+                      if (languageSelect) {
+                          languageSelect.value = targetLanguage; // Set the language
+                          languageSelect.dispatchEvent(new Event('change', { bubbles: true })); // Trigger change event
+                          const translateButton = iframeDocument.querySelector('button.goog-te-menu2-item');
+                          if (translateButton) {
+                              translateButton.click(); // Click the translate button
+                          }
+                      }
+                  }
+              }, 1000); // Delay to allow iframe to load
+          });
+      });
+  </script>
+
+</body>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
